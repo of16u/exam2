@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>اختبار العمليات الاستخباراتية</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
+
+<style>
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Orbitron', sans-serif;
+    background: #111;
+    color: #eee;
+    overflow-x: hidden;
+  }
+
+  .background-blur {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf5HNemAJbYxtZQuKfgn-anFL4B7i75GAJlcQXF1bYSgLqdfzKIV0VnItm8gDLmIpzJtw&usqp=CAU') 
+      no-repeat center center/cover;
+    filter: blur(8px) brightness(0.4);
+    z-index: -1;
+  }
+
+  /* الشعار أعلى اليمين */
+  .logo-top-right {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    width: 70px;
+    height: 70px;
+    background: url('https://media.discordapp.net/attachments/1370477402647560314/1441265771509711050/39C4B5EA-7046-41A2-8810-2577B114B1D0.png?ex=692db119&is=692c5f99&hm=4b0494dbe2e4bcd4b88dca573ca7220c585ff459597e7cfdbdcf10d7400ebf4c&=&format=webp&quality=lossless&width=763&height=763') no-repeat center/contain;
+    background-size: contain;
+    z-index: 1000;
+  }
+
+  /* الشعار أعلى اليسار */
+  .logo-top-left {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    width: 70px;
+    height: 70px;
+    background: url('https://media.discordapp.net/attachments/1370477402647560314/1441265771509711050/39C4B5EA-7046-41A2-8810-2577B114B1D0.png?ex=692db119&is=692c5f99&hm=4b0494dbe2e4bcd4b88dca573ca7220c585ff459597e7cfdbdcf10d7400ebf4c&=&format=webp&quality=lossless&width=763&height=763') no-repeat center/contain;
+    background-size: contain;
+    z-index: 1000;
+  }
+
+  .container {
+    width: 90%;
+    max-width: 900px;
+    margin: 60px auto 40px auto;
+    background: rgba(30,30,30,0.85);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px #666;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 2.5em;
+    margin-bottom: 25px;
+    text-shadow: 0 0 10px #fff;
+  }
+
+  .input-group {
+    margin-bottom: 20px;
+  }
+
+  input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    font-size: 1.2em;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    box-shadow: 0 0 10px #555 inset;
+    transition: 0.3s;
+  }
+
+  input::placeholder {
+    color: #ccc;
+  }
+
+  input:focus {
+    background: rgba(255,255,255,0.2);
+    box-shadow: 0 0 15px #88aaff inset;
+    outline: none;
+  }
+
+  button {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.4em;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    background: #2c3e50; /* أزرق ملكي غامق */
+    color: white;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: 0.3s;
+  }
+
+  button:hover {
+    background: #34495e; /* رمادي متناسق */
+  }
+
+  .question-card {
+    background: rgba(50,50,50,0.85);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 15px #444;
+  }
+
+  .answer {
+    padding: 12px;
+    border-radius: 8px;
+    margin: 10px 0;
+    background: rgba(200,200,200,0.05);
+    border: 1px solid #555;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .answer:hover {
+    background: rgba(150,150,150,0.15);
+    transform: translateX(-5px);
+  }
+
+  .answer.selected {
+    background: rgba(52, 73, 94, 0.6); /* أزرق ملكي غامق */
+    border-color: #34495e; /* رمادي متناسق */
+    box-shadow: 0 0 12px #34495e;
+  }
+
+  .correct {
+    background: rgba(0, 255, 0, 0.15);
+    border-color: #0f0;
+    box-shadow: 0 0 10px #0f0;
+  }
+
+  .wrong {
+    background: rgba(255, 0, 0, 0.15);
+    border-color: #f00;
+    box-shadow: 0 0 10px #f00;
+  }
+
+  #resultBox {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 1.8em;
+    font-weight: bold;
+  }
+
+  .pass {
+    color: #0f0;
+    text-shadow: 0 0 10px #0f0;
+  }
+
+  .fail {
+    color: #f00;
+    text-shadow: 0 0 10px #f00;
+  }
+</style>
+</head>
+<body>
+
+  <div class="background-blur"></div>
+
+  <!-- شعارات في أعلى يمين ويسار -->
+  <div class="logo-top-right"></div>
+  <div class="logo-top-left"></div>
+
+  <div class="container" id="infoPage">
+    <h1>تسجيل معلومات المتقدم</h1>
+
+    <div class="input-group">
+      <input id="nameInput" placeholder="الاسم الكامل" />
+    </div>
+
+    <div class="input-group">
+      <input id="idInput" placeholder="الآيدي" />
+    </div>
+
+    <div class="input-group">
+      <input id="milInput" placeholder="الكود العسكري" />
+    </div>
+
+    <button onclick="startExam()">دخول الاختبار</button>
+  </div>
+
+  <div class="container" id="examPage" style="display:none;">
+    <h1>اختبار العمليات الاستخباراتية</h1>
+    <div id="questions"></div>
+    <button onclick="finishExam()">إنهاء الاختبار</button>
+  </div>
+
+  <div class="container" id="resultPage" style="display:none;">
+    <h1>النتيجة</h1>
+    <div id="resultBox"></div>
+  </div>
+
+<script>
+  const questionsData = [
+    {
+      q: "أثناء مرحلة تحديد الهدف، تلاحظ أن المعلومات المتوفرة غير كافية لتحديد الشخص الأساسي داخل العصابة. ما هو القرار الأكثر احترافية؟",
+      a: [
+        "أ) البدء بالعملية والاعتماد على الارتجال",
+        "ب) تأجيل العملية وإعادة توسيع شبكة جمع المعلومات",
+        "ج) استهداف أي شخص داخل المقر"
+      ],
+      c: 1
+    },
+    {
+      q: "أثناء الاستطلاع الجوي، يظهر أن المقر يحتوي على مخرج سري لم يُذكر سابقًا. ما هو الإجراء الصحيح؟",
+      a: [
+        "أ) تجاهله لأنه غير مهم",
+        "ب) تعديل خطة المداهمة فورًا وإضافة وحدة تغطي المخرج",
+        "ج) الهجوم مباشرة قبل أن يستخدموه"
+      ],
+      c: 1
+    },
+    {
+      q: "إذا أبلغ الجاسوس أن العصابة قامت بتغيير مواقع أفرادها داخل المقر، ما هو السيناريو الأفضل للتعامل؟",
+      a: [
+        "أ) تغيير خطة الدخول فورًا",
+        "ب) سحب الوحدات وإعادة تقييم الوضع",
+        "ج) الاستمرار بالخطة الأصلية دون تعديل"
+      ],
+      c: 0
+    },
+    {
+      q: "لديك معلومات متضاربة عن عدد أفراد العصابة (بين 10 و 30). كيف يتم اتخاذ قرار التخطيط السليم؟",
+      a: [
+        "أ) وضع خطة تناسب الحد الأدنى فقط",
+        "ب) وضع خطة تتعامل مع أعلى رقم ممكن",
+        "ج) الدخول بدون خطة معتمدة"
+      ],
+      c: 1
+    },
+    {
+      q: "أثناء تحليل المعلومات، اكتشفت أن المقر محمي بكاميرات مراقبة لم تُذكر في التقارير الأولية. ما هو أنسب تعديل للخطة؟",
+      a: [
+        "أ) استبدال الهجوم السريع بتسلل صامت وتعطيل الكاميرات",
+        "ب) تجاهل الكاميرات لأنها غير فعالة",
+        "ج) تأجيل المهمة لأجل غير معلوم"
+      ],
+      c: 0
+    },
+    {
+      q: "إذا كانت العصابة تتعامل مع جهة خارجية قوية، ما هو التحرك الاستخباراتي الأكثر فاعلية؟",
+      a: [
+        "أ) جمع معلومات عن الجهة المتعاونة لمعرفة تأثيرها",
+        "ب) التركيز على العصابة فقط",
+        "ج) إلغاء العملية نهائيًا"
+      ],
+      c: 0
+    },
+    {
+      q: "أثناء المراقبة اكتشفت أن العصابة بدأت تنقل معداتها خارج المقر. ماذا يعني هذا استخبارياً؟",
+      a: [
+        "أ) أن الخطة اكتُشفت أو هناك حدث غير طبيعي",
+        "ب) أنه أمر طبيعي ولا يستحق الرد",
+        "ج) أن العصابة تجهز حفلة"
+      ],
+      c: 0
+    },
+    {
+      q: "إذا فشل العميل السري في إرسال تحديثات لمدة طويلة، ما الإجراء الصحيح؟",
+      a: [
+        "أ) افتراض أنه بخير",
+        "ب) اعتباره مكشوفًا وتغيير الخطة بالكامل",
+        "ج) إرسال قوة إنقاذ فورًا بدون خطة"
+      ],
+      c: 1
+    },
+    {
+      q: "عند وضع خطة المداهمة، لماذا يجب إنشاء سيناريو بديل (Plan B)؟",
+      a: [
+        "أ) لأن الخطط دائمًا تفشل",
+        "ب) للتعامل مع المتغيرات غير المتوقعة أثناء العملية",
+        "ج) لزيادة مدة المهمة فقط"
+      ],
+      c: 1
+    },
+    {
+      q: "بعد العملية، تم القبض على 80٪ من المطلوبين بينما هرب البعض عبر المخرج البحري. كيف يتم تقييم العملية؟",
+      a: [
+        "أ) فشل كامل",
+        "ب) نجاح جزئي مع تحديد نقطة ضعف في الخطة",
+        "ج) نجاح كامل دون ملاحظات"
+      ],
+      c: 1
+    }
+  ];
+
+  let selectedAnswers = [];
+
+  function startExam() {
+    document.getElementById("infoPage").style.display = "none";
+    document.getElementById("examPage").style.display = "block";
+
+    let qBox = document.getElementById("questions");
+    qBox.innerHTML = "";
+
+    questionsData.forEach((item, i) => {
+      let card = document.createElement("div");
+      card.className = "question-card";
+
+      let qTitle = document.createElement("p");
+      qTitle.innerHTML = `<strong>${i + 1}- ${item.q}</strong>`;
+      card.appendChild(qTitle);
+
+      item.a.forEach((ans, j) => {
+        let ansBtn = document.createElement("div");
+        ansBtn.className = "answer";
+        ansBtn.innerText = ans;
+
+        ansBtn.onclick = () => {
+          let all = card.querySelectorAll(".answer");
+          all.forEach((a) => a.classList.remove("selected"));
+          ansBtn.classList.add("selected");
+          selectedAnswers[i] = j;
+        };
+
+        card.appendChild(ansBtn);
+      });
+
+      qBox.appendChild(card);
+    });
+  }
+
+  function finishExam() {
+    let score = 0;
+
+    document.getElementById("examPage").style.display = "none";
+    document.getElementById("resultPage").style.display = "block";
+
+    const cards = document.querySelectorAll(".question-card");
+
+    questionsData.forEach((item, i) => {
+      let selected = selectedAnswers[i];
+      let correct = item.c;
+
+      let answers = cards[i].querySelectorAll(".answer");
+
+      answers[correct].classList.add("correct");
+
+      if (selected !== correct) {
+        answers[selected]?.classList.add("wrong");
+      } else {
+        score++;
+      }
+    });
+
+    let result = document.getElementById("resultBox");
+    let status =
+      score >= 14
+        ? `<span class='pass'>✔ ناجح</span>`
+        : `<span class='fail'>❌ راسب</span>`;
+
+    result.innerHTML = `النتيجة: ${score} / 20 <br><br> ${status}`;
+  }
+</script>
+</body>
+</html>
